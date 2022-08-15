@@ -47,9 +47,9 @@ jobs:
       env:
         RELEASE_FILENAME: ${{steps.build.outputs.release_filename}}
       run: |
-        (Get-FileHash $release_filename -Algorithm SHA256).Hash | Out-File "${release_filename}.sha256"
-        Write-Output "Release name: $release_filename"
-        Write-Output "sha256 checksum: $(Get-Content  "${release_filename}.sha256")"
+        (Get-FileHash $env:RELEASE_FILENAME -Algorithm SHA256).Hash | Out-File "${env:RELEASE_FILENAME}.sha256"
+        Write-Output "Release name: $env:RELEASE_FILENAME"
+        Write-Output "sha256 checksum: $(Get-Content  "${env:RELEASE_FILENAME}.sha256")"
         cd ..
 
     - name: Install script prerequisites
