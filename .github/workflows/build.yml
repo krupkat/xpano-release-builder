@@ -42,11 +42,13 @@ jobs:
         $release_filename = "$env:TARGET_REPO-$env:TAG-windows-x64.zip"
         Compress-Archive -Path install/* -DestinationPath $release_filename
         Write-Output "::set-output name=release_filename::$release_filename"
+        cd ..
 
     - name: Compute checksum
       env:
         RELEASE_FILENAME: ${{steps.build.outputs.release_filename}}
       run: |
+        cd $env:TARGET_REPO
         (Get-FileHash $env:RELEASE_FILENAME -Algorithm SHA256).Hash | Out-File "${env:RELEASE_FILENAME}.sha256"
         Write-Output "Release name: $env:RELEASE_FILENAME"
         Write-Output "sha256 checksum: $(Get-Content  "${env:RELEASE_FILENAME}.sha256")"
