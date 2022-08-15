@@ -1,0 +1,57 @@
+name: Build and upload release
+
+on: 
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build'
+        required: true
+        type: string
+
+env:
+  TARGET_REPO: xpano
+
+jobs:
+  upload-release-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Checkout target repo
+      uses: actions/checkout@v3
+      with:
+        path: ${{env.TARGET_REPO}}
+        ref: ${{inputs.tag}}
+        repository: ${{github.repository_owner}}/${{env.TARGET_REPO}}
+        submodules: true
+
+    - name: Setup msvc compiler environment
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+
+    - name: Build
+      id: build
+      env:
+        TAG: ${{inputs.tag}}
+      run: |
+        cd $env:TARGET_REPO
+        ./misc/build/build-windows-latest.ps1
+        cd ..
+        $release_filename = "$env:TARGET_REPO-$env:TAG-windows-x64.zip"
+        Compress-Archive -Path install/* -DestinationPath $release_filename
+        Write-Output "::set-output name=release_filename::$release_filename"
+        cd ..
+
+    - name: Install script prerequisites
+      run: pip install -r requirements.txt
+
+    - name: Upload asset
+      env:
+        RELEASE_FILENAME: ${{steps.build.outputs.release_filename}}
+        SECRET_TOKEN: ${{secrets.SECRET_TOKEN}}
+        TAG: ${{inputs.tag}}
+      run: |
+        cd $env:TARGET_REPO
+        python ../upload_assets.py --repo $env:TARGET_REPO --tag $env:TAG $env:RELEASE_FILENAME
