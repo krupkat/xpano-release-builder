@@ -42,16 +42,24 @@ jobs:
         $release_filename = "$env:TARGET_REPO-$env:TAG-windows-x64.zip"
         Compress-Archive -Path install/* -DestinationPath $release_filename
         Write-Output "::set-output name=release_filename::$release_filename"
+
+    - name: Compute checksum
+      env:
+        RELEASE_FILENAME: ${{steps.build.outputs.release_filename}}
+      run: |
+        (Get-FileHash $release_filename -Algorithm SHA256).Hash | Out-File "${release_filename}.sha256"
+        Write-Output "Release name: $release_filename"
+        Write-Output "sha256 checksum: $(Get-Content  "${release_filename}.sha256")"
         cd ..
 
     - name: Install script prerequisites
       run: pip install -r requirements.txt
 
-    - name: Upload asset
+    - name: Upload release files
       env:
         RELEASE_FILENAME: ${{steps.build.outputs.release_filename}}
         SECRET_TOKEN: ${{secrets.SECRET_TOKEN}}
         TAG: ${{inputs.tag}}
       run: |
         cd $env:TARGET_REPO
-        python ../upload_assets.py --repo $env:TARGET_REPO --tag $env:TAG $env:RELEASE_FILENAME
+        python ../upload_assets.py --repo $env:TARGET_REPO --tag $env:TAG $env:RELEASE_FILENAME "${env:RELEASE_FILENAME}.sha256"
