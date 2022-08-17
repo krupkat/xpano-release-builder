@@ -9,6 +9,7 @@ on:
         type: string
 
 env:
+  REPOSITORY_OWNER: krupkat
   TARGET_REPO: xpano
 
 jobs:
@@ -23,7 +24,7 @@ jobs:
       with:
         path: ${{env.TARGET_REPO}}
         ref: ${{inputs.tag}}
-        repository: ${{github.repository_owner}}/${{env.TARGET_REPO}}
+        repository: ${{env.REPOSITORY_OWNER}}/${{env.TARGET_REPO}}
         submodules: true
 
     - name: Setup msvc compiler environment

@@ -14,6 +14,10 @@ if __name__ == "__main__":
     parser.add_argument("files", help="Files to upload", nargs="*")
     args = parser.parse_args()
 
+    if args.secret_env not in os.environ:
+        print(f"{args.secret_env} not found in environment, skipping upload")
+        exit()
+
     secret = os.environ.get(args.secret_env)
     git = github.Github(secret)
     user = git.get_user()
