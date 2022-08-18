@@ -1,1 +1,0 @@
-python ./local/translate_github_action.py .github/workflows/build.yml --output_dir . --tag "v0.1.0"
