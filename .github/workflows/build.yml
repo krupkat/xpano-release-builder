@@ -40,7 +40,7 @@ jobs:
         ./misc/build/build-windows-latest.ps1
         $release_filename = "$env:TARGET_REPO-$env:TAG-windows-x64.zip"
         Compress-Archive -Path install/* -DestinationPath $release_filename
-        Write-Output "release_filename::$release_filename" >> $env:GITHUB_OUTPUT
+        Write-Output "release_filename=$release_filename" >> $env:GITHUB_OUTPUT
         cd ..
 
     - name: Compute checksum
