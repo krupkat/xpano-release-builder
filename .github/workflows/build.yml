@@ -65,3 +65,53 @@ jobs:
         cd $env:TARGET_REPO
         python ../upload_assets.py --repo $env:TARGET_REPO --tag $env:TAG $env:RELEASE_FILENAME "${env:RELEASE_FILENAME}.sha256"
         cd ..
+
+jobs:
+  upload-release-macos:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Checkout target repo
+      uses: actions/checkout@v3
+      with:
+        path: ${{TARGET_REPO}}
+        ref: ${{inputs.tag}}
+        repository: ${{github.repository_owner}}/${{TARGET_REPO}}
+        submodules: true
+
+    - name: Build
+      id: build
+      env:
+        TAG: ${{inputs.tag}}
+      run: |
+        cd $TARGET_REPO
+        ./misc/build/build-macos-12.sh
+        release_filename="$TARGET_REPO-$TAG-macos-x86_64.zip"
+        zip -r $release_filename Xpano.app
+        echo "release_filename=$release_filename" >> "$GITHUB_OUTPUT"
+        cd ..
+
+    - name: Compute checksum
+      env:
+        RELEASE_FILENAME: ${{steps.build.outputs.release_filename}}
+      run: |
+        cd $TARGET_REPO
+        sha256sum "$RELEASE_FILENAME" > "$RELEASE_FILENAME.sha256"
+        echo "sha256 checksum:"
+        cat "$RELEASE_FILENAME.sha256"
+        cd ..
+
+    - name: Install script prerequisites
+      run: pip install -r requirements.txt
+
+    - name: Upload release files
+      env:
+        RELEASE_FILENAME: ${{steps.build.outputs.release_filename}}
+        SECRET_TOKEN: ${{secrets.SECRET_TOKEN}}
+        TAG: ${{inputs.tag}}
+      run: |
+        cd $TARGET_REPO
+        python ../upload_assets.py --repo $TARGET_REPO --tag $TAG "$RELEASE_FILENAME" "$RELEASE_FILENAME.sha256"
+        cd ..
