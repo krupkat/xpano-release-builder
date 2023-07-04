@@ -72,6 +72,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Install prerequisites
+      run: |
+        brew install sdl2 spdlog catch2
+
     - name: Checkout target repo
       uses: actions/checkout@v3
       with:
