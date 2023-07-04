@@ -101,7 +101,7 @@ jobs:
         RELEASE_FILENAME: ${{steps.build.outputs.release_filename}}
       run: |
         cd $TARGET_REPO
-        sha256sum "$RELEASE_FILENAME" > "$RELEASE_FILENAME.sha256"
+        shasum -a 256 "$RELEASE_FILENAME" > "$RELEASE_FILENAME.sha256"
         echo "sha256 checksum:"
         cat "$RELEASE_FILENAME.sha256"
         cd ..
