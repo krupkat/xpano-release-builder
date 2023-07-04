@@ -15,7 +15,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     secret = os.environ.get(args.secret_env)
-    git = github.Github(secret)
+    git = github.Github(auth=github.Auth.Token(secret))
     user = git.get_user()
     repo = user.get_repo(args.repo)
     release = repo.get_release(args.tag)
