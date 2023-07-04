@@ -66,7 +66,6 @@ jobs:
         python ../upload_assets.py --repo $env:TARGET_REPO --tag $env:TAG $env:RELEASE_FILENAME "${env:RELEASE_FILENAME}.sha256"
         cd ..
 
-jobs:
   upload-release-macos:
     runs-on: macos-latest
 
