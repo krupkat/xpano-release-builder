@@ -75,9 +75,9 @@ jobs:
     - name: Checkout target repo
       uses: actions/checkout@v3
       with:
-        path: ${{TARGET_REPO}}
+        path: ${{env.TARGET_REPO}}
         ref: ${{inputs.tag}}
-        repository: ${{github.repository_owner}}/${{TARGET_REPO}}
+        repository: ${{github.repository_owner}}/${{env.TARGET_REPO}}
         submodules: true
 
     - name: Build
