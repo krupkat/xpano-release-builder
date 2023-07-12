@@ -165,5 +165,5 @@ jobs:
         TAG: ${{inputs.tag}}
       run: |
         cd "$TARGET_REPO/packages"
-        python3 ../upload_assets.py --repo $TARGET_REPO --tag $TAG "$RELEASE_FILENAME" "$RELEASE_FILENAME.sha256"
+        python3 ../../upload_assets.py --repo $TARGET_REPO --tag $TAG "$RELEASE_FILENAME" "$RELEASE_FILENAME.sha256"
         cd ../..
