@@ -118,3 +118,52 @@ jobs:
         cd $TARGET_REPO
         python3 ../upload_assets.py --repo $TARGET_REPO --tag $TAG "$RELEASE_FILENAME" "$RELEASE_FILENAME.sha256"
         cd ..
+
+  upload-sources:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Checkout target repo
+      uses: actions/checkout@v3
+      with:
+        path: ${{env.TARGET_REPO}}
+        ref: ${{inputs.tag}}
+        repository: ${{github.repository_owner}}/${{env.TARGET_REPO}}
+        submodules: true
+
+    - name: Build
+      id: build
+      env:
+        TAG: ${{inputs.tag}}
+      run: |
+        cd $TARGET_REPO
+        echo "test export-ignore" > external/simde/.gitattributes
+        ./misc/build/linux/make_tar.sh "$TAG"
+        release_filename=`ls packages`
+        echo "release_filename=$release_filename" >> "$GITHUB_OUTPUT"
+        cd ..
+
+    - name: Compute checksum
+      env:
+        RELEASE_FILENAME: ${{steps.build.outputs.release_filename}}
+      run: |
+        cd "$TARGET_REPO/packages"
+        shasum -a 256 "$RELEASE_FILENAME" > "$RELEASE_FILENAME.sha256"
+        echo "sha256 checksum:"
+        cat "$RELEASE_FILENAME.sha256"
+        cd ../..
+
+    - name: Install script prerequisites
+      run: pip3 install -r requirements.txt
+
+    - name: Upload release files
+      env:
+        RELEASE_FILENAME: ${{steps.build.outputs.release_filename}}
+        SECRET_TOKEN: ${{secrets.SECRET_TOKEN}}
+        TAG: ${{inputs.tag}}
+      run: |
+        cd "$TARGET_REPO/packages"
+        python3 ../upload_assets.py --repo $TARGET_REPO --tag $TAG "$RELEASE_FILENAME" "$RELEASE_FILENAME.sha256"
+        cd ../..
