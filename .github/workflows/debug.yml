@@ -42,7 +42,7 @@ jobs:
         TAG: "v0.16.2"
       run: |
         cd $TARGET_REPO
-        touch Xpano.AppImage
+        echo asdfghjkl > Xpano.AppImage
         release_filename=`ls . | grep Xpano`
         echo "release_filename=$release_filename" >> "$GITHUB_OUTPUT"
         cd ..
