@@ -58,7 +58,9 @@ jobs:
         cd ..
 
     - name: Install script prerequisites
-      run: pip3 install -r requirements.txt
+      run: |
+        pip3 install -r requirements.txt
+        pip3 install pyOpenSSL --upgrade
 
     - name: Upload release files
       env:
