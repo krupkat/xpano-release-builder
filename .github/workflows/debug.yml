@@ -1,0 +1,78 @@
+name: Build and upload release
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+
+env:
+  TARGET_REPO: xpano
+
+jobs:
+   upload-release-appimage:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install linuxdeploy
+      run: |
+        wget https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20230713-1/linuxdeploy-x86_64.AppImage
+        chmod +x linuxdeploy-x86_64.AppImage
+        echo "$(pwd)" >> $GITHUB_PATH
+
+    - name: Install prerequisites
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev
+
+    - name: Checkout target repo
+      uses: actions/checkout@v3
+      with:
+        path: ${{env.TARGET_REPO}}
+        ref: "v0.16.2"
+        repository: ${{github.repository_owner}}/${{env.TARGET_REPO}}
+        submodules: true
+
+    - name: Build
+      id: build
+      env:
+        TAG: "v0.16.2"
+      run: |
+        cd $TARGET_REPO
+        echo asdfghjkl > Xpano.AppImage
+        release_filename=`ls . | grep Xpano`
+        echo "release_filename=$release_filename" >> "$GITHUB_OUTPUT"
+        cd ..
+
+    - name: Compute checksum
+      env:
+        RELEASE_FILENAME: ${{steps.build.outputs.release_filename}}
+      run: |
+        cd $TARGET_REPO
+        shasum -a 256 "$RELEASE_FILENAME" > "$RELEASE_FILENAME.sha256"
+        echo "sha256 checksum:"
+        cat "$RELEASE_FILENAME.sha256"
+        cd ..
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install script prerequisites
+      run: |
+        python -m pip install --upgrade pip
+        pip3 install -r requirements.txt
+
+    - name: Upload release files
+      env:
+        RELEASE_FILENAME: ${{steps.build.outputs.release_filename}}
+        SECRET_TOKEN: ${{secrets.SECRET_TOKEN}}
+        TAG: "v0.16.2"
+      run: |
+        cd $TARGET_REPO
+        python3 ../upload_assets.py --repo $TARGET_REPO --tag $TAG "$RELEASE_FILENAME" "$RELEASE_FILENAME.sha256"
+        cd ..
