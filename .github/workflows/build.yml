@@ -67,7 +67,18 @@ jobs:
         cd ..
 
   upload-release-macos:
-    runs-on: macos-latest
+    name: upload-release-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-12, macos-14]
+        include:
+          - os: macos-12
+            suffix: 'x86_64'
+          - os: macos-14
+            suffix: 'arm64'
 
     steps:
     - uses: actions/checkout@v3
@@ -88,10 +99,11 @@ jobs:
       id: build
       env:
         TAG: ${{inputs.tag}}
+        SUFFIX: ${{ matrix.suffix }}
       run: |
         cd $TARGET_REPO
-        ./misc/build/build-macos-12.sh
-        release_filename="$TARGET_REPO-$TAG-macos-x86_64.zip"
+        ./misc/build/build-macos.sh
+        release_filename="$TARGET_REPO-$TAG-macos-$SUFFIX.zip"
         zip -r $release_filename Xpano.app
         echo "release_filename=$release_filename" >> "$GITHUB_OUTPUT"
         cd ..
