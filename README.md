@@ -69,3 +69,12 @@ dput ppa:krupkat/code xpano_0.12.0-0~ppa1~kinetic_source.changes
 cd packages lunar
 dput ppa:krupkat/code xpano_0.12.0-0~ppa1~lunar_source.changes
 ```
+
+## nixpkgs
+
+- sync the nixpkgs fork: https://github.com/krupkat/nixpkgs
+- Update the derivation: https://github.com/krupkat/nixpkgs/blob/master/pkgs/applications/graphics/xpano/default.nix
+- get the new hash by running `nix-prefetch-github krupkat xpano --fetch-submodules --rev vx.y.z`
+- build and test: `nix-build . -A xpano`
+- commit with description e.g.: "xpano: 0.17.0 -> 0.18.0"
+- open a PR to nixpkgs
