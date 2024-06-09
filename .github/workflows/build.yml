@@ -16,10 +16,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Checkout target repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: ${{env.TARGET_REPO}}
         ref: ${{inputs.tag}}
@@ -81,14 +81,14 @@ jobs:
             suffix: 'arm64'
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install prerequisites
       run: |
         brew install sdl2 spdlog catch2
 
     - name: Checkout target repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: ${{env.TARGET_REPO}}
         ref: ${{inputs.tag}}
@@ -135,10 +135,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Checkout target repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: ${{env.TARGET_REPO}}
         ref: ${{inputs.tag}}
@@ -184,7 +184,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install linuxdeploy
       run: |
@@ -198,7 +198,7 @@ jobs:
           sudo apt-get install -y libdbus-1-dev
 
     - name: Checkout target repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: ${{env.TARGET_REPO}}
         ref: ${{inputs.tag}}
@@ -227,7 +227,7 @@ jobs:
         cd ..
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'
 
