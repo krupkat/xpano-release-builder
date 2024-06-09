@@ -30,6 +30,7 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x64
+        toolset: 19.39
 
     - name: Build
       id: build
